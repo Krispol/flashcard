@@ -16,11 +16,13 @@ import Divider from "@mui/material/Divider";
 interface FlashcardSectionProps {
   questionnaireId: string;
   onBack: () => void;
+  onStartQuiz: () => void;
 }
 
 export default function FlashcardSection({
   questionnaireId,
   onBack,
+  onStartQuiz,
 }: FlashcardSectionProps) {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
 
@@ -170,6 +172,10 @@ export default function FlashcardSection({
         </Button>
 
         <Typography variant="h4">Flashcards</Typography>
+
+        <Button variant="contained" size="small" onClick={onStartQuiz}>
+          ▶ Quiz mode
+        </Button>
       </Stack>
 
       <Box
