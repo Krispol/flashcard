@@ -24,6 +24,8 @@ export default function FlashcardSection({
   const [editA, setEditA] = useState("");
   const [editNote, setEditNote] = useState("");
 
+  const [revealed, setRevealed] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     (async () => {
       const { data, error } = await supabaseBrowser
@@ -38,6 +40,8 @@ export default function FlashcardSection({
       }
 
       setFlashcards(data);
+
+      setRevealed(new Set());
     })();
   }, [questionnaireId]);
 
@@ -64,6 +68,12 @@ export default function FlashcardSection({
     }
 
     setFlashcards((prev) => [...prev, data]);
+
+    setRevealed((prev) => {
+      const copy = new Set(prev);
+      copy.delete(data.id);
+      return copy;
+    });
 
     setNewQ("");
     setNewA("");
@@ -121,9 +131,27 @@ export default function FlashcardSection({
 
     setFlashcards((prev) => prev.filter((card) => card.id !== id));
 
+    setRevealed((prev) => {
+      const copy = new Set(prev);
+      copy.delete(id);
+      return copy;
+    });
+
     if (editId === id) {
       cancelEdit();
     }
+  }
+
+  function toggleReveal(cardId: string) {
+    setRevealed((prev) => {
+      const copy = new Set(prev);
+      if (copy.has(cardId)) {
+        copy.delete(cardId);
+      } else {
+        copy.add(cardId);
+      }
+      return copy;
+    });
   }
 
   return (
@@ -168,69 +196,88 @@ export default function FlashcardSection({
         <p>No flashcards yet for this questionnaire.</p>
       ) : (
         <ul>
-          {flashcards.map((card) => (
-            <li
-              key={card.id}
-              style={{
-                marginBottom: "1rem",
-                border: "1px solid gray",
-                padding: "0.5rem",
-              }}
-            >
-              {editId === card.id ? (
-                <form onSubmit={handleSaveFlashcard}>
-                  <div>
-                    <input
-                      required
-                      value={editQ}
-                      onChange={(e) => setEditQ(e.target.value)}
-                    />
-                  </div>
+          {flashcards.map((card) => {
+            const isEditing = editId === card.id;
+            const isRevealed = revealed.has(card.id);
 
-                  <div>
-                    <input
-                      required
-                      value={editA}
-                      onChange={(e) => setEditA(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      value={editNote}
-                      onChange={(e) => setEditNote(e.target.value)}
-                    />
-                  </div>
-
-                  <button type="submit">Save</button>
-                  <button type="button" onClick={cancelEdit}>
-                    Cancel
-                  </button>
-                </form>
-              ) : (
-                <div>
-                  <div>
-                    <strong>Q:</strong> {card.question}
-                  </div>
-                  <div>
-                    <strong>A:</strong> {card.answer}
-                  </div>
-                  {card.note ? (
+            return (
+              <li
+                key={card.id}
+                style={{
+                  marginBottom: "1rem",
+                  border: "1px solid gray",
+                  padding: "0.5rem",
+                }}
+              >
+                {isEditing ? (
+                  <form onSubmit={handleSaveFlashcard}>
                     <div>
-                      <strong>Note:</strong> {card.note}
+                      <input
+                        required
+                        value={editQ}
+                        onChange={(e) => setEditQ(e.target.value)}
+                      />
                     </div>
-                  ) : null}
 
-                  <div>
-                    <button onClick={() => startEdit(card)}>Edit</button>
-                    <button onClick={() => handleDeleteFlashcard(card.id)}>
-                      Delete
+                    <div>
+                      <input
+                        required
+                        value={editA}
+                        onChange={(e) => setEditA(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        value={editNote}
+                        onChange={(e) => setEditNote(e.target.value)}
+                      />
+                    </div>
+
+                    <button type="submit">Save</button>
+                    <button type="button" onClick={cancelEdit}>
+                      Cancel
                     </button>
+                  </form>
+                ) : (
+                  <div>
+                    <div>
+                      <strong>Q:</strong> {card.question}
+                    </div>
+
+                    <div>
+                      <strong>A:</strong>{" "}
+                      {isRevealed ? (
+                        <span>{card.answer}</span>
+                      ) : (
+                        <span>[ hidden ]</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleReveal(card.id)}
+                        style={{ marginLeft: "0.5rem" }}
+                      >
+                        {isRevealed ? "Hide" : "Show"}
+                      </button>
+                    </div>
+
+                    {card.note ? (
+                      <div>
+                        <strong>Note:</strong> {card.note}
+                      </div>
+                    ) : null}
+
+                    <div>
+                      <button onClick={() => startEdit(card)}>Edit</button>
+                      <button onClick={() => handleDeleteFlashcard(card.id)}>
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </li>
-          ))}
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
