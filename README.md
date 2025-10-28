@@ -1,14 +1,16 @@
 ## Flashcard
 
-Flashcard app with:
+(very) basic Flashcard app with:
 
 - Create,Read,Update and Delete functionality
 - Play modes
 - Usage statistics
 
+The app is split into Questionnaire management and flashcards that relate to their respective questionnaires.
+
 ## Database creation commands
 
-To create the required database run this sql in your DB cluster:
+To create the required database run these sql commands in your database:
 
 ```bash
 create table questionnaire (
@@ -42,7 +44,6 @@ before update on flash
 for each row
 execute function set_updated_at();
 
--- 4. RLS (dev-open policies)
 alter table questionnaire enable row level security;
 alter table flash enable row level security;
 
