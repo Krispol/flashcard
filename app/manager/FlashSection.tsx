@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { Flashcard } from "@/types/objects";
 
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+
 interface FlashcardSectionProps {
   questionnaireId: string;
   onBack: () => void;
@@ -40,8 +49,7 @@ export default function FlashcardSection({
       }
 
       setFlashcards(data);
-
-      setRevealed(new Set());
+      setRevealed(new Set(data.map((c) => c.id)));
     })();
   }, [questionnaireId]);
 
@@ -155,131 +163,187 @@ export default function FlashcardSection({
   }
 
   return (
-    <section>
-      <button onClick={onBack}>← Back to questionnaires</button>
+    <Box p={2}>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+        <Button variant="text" onClick={onBack}>
+          ← Back to questionnaires
+        </Button>
 
-      <h1>Flashcards</h1>
+        <Typography variant="h4">Flashcards</Typography>
+      </Stack>
 
-      <form onSubmit={handleCreateFlashcard}>
-        <div>
-          <input
+      <Box
+        component="form"
+        onSubmit={handleCreateFlashcard}
+        sx={{ mb: 4, maxWidth: 500 }}
+      >
+        <Typography variant="h6" gutterBottom>
+          Add new flashcard
+        </Typography>
+
+        <Stack spacing={2}>
+          <TextField
             required
-            placeholder="Question"
+            label="Question"
             value={newQ}
             onChange={(e) => setNewQ(e.target.value)}
+            size="small"
           />
-        </div>
 
-        <div>
-          <input
+          <TextField
             required
-            placeholder="Answer"
+            label="Answer"
             value={newA}
             onChange={(e) => setNewA(e.target.value)}
+            size="small"
           />
-        </div>
 
-        <div>
-          <input
-            placeholder="Note (optional)"
+          <TextField
+            label="Note (optional)"
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
+            size="small"
           />
-        </div>
 
-        <button type="submit">Add flashcard</button>
-      </form>
+          <Button type="submit" variant="contained">
+            Add card
+          </Button>
+        </Stack>
+      </Box>
 
-      <h2>Existing cards</h2>
+      <Divider sx={{ mb: 3 }} />
+
+      <Typography variant="h6" gutterBottom>
+        Existing cards
+      </Typography>
 
       {flashcards.length === 0 ? (
-        <p>No flashcards yet for this questionnaire.</p>
+        <Typography color="text.secondary">
+          No flashcards yet for this questionnaire.
+        </Typography>
       ) : (
-        <ul>
+        <Stack spacing={2}>
           {flashcards.map((card) => {
             const isEditing = editId === card.id;
             const isRevealed = revealed.has(card.id);
 
             return (
-              <li
-                key={card.id}
-                style={{
-                  marginBottom: "1rem",
-                  border: "1px solid gray",
-                  padding: "0.5rem",
-                }}
-              >
-                {isEditing ? (
-                  <form onSubmit={handleSaveFlashcard}>
-                    <div>
-                      <input
-                        required
-                        value={editQ}
-                        onChange={(e) => setEditQ(e.target.value)}
-                      />
-                    </div>
+              <Card key={card.id} variant="outlined">
+                <CardContent>
+                  {isEditing ? (
+                    <Box
+                      component="form"
+                      onSubmit={handleSaveFlashcard}
+                      sx={{ maxWidth: 600 }}
+                    >
+                      <Stack spacing={2}>
+                        <TextField
+                          required
+                          label="Question"
+                          value={editQ}
+                          onChange={(e) => setEditQ(e.target.value)}
+                          size="small"
+                        />
 
-                    <div>
-                      <input
-                        required
-                        value={editA}
-                        onChange={(e) => setEditA(e.target.value)}
-                      />
-                    </div>
+                        <TextField
+                          required
+                          label="Answer"
+                          value={editA}
+                          onChange={(e) => setEditA(e.target.value)}
+                          size="small"
+                        />
 
-                    <div>
-                      <input
-                        value={editNote}
-                        onChange={(e) => setEditNote(e.target.value)}
-                      />
-                    </div>
+                        <TextField
+                          label="Note"
+                          value={editNote}
+                          onChange={(e) => setEditNote(e.target.value)}
+                          size="small"
+                        />
 
-                    <button type="submit">Save</button>
-                    <button type="button" onClick={cancelEdit}>
-                      Cancel
-                    </button>
-                  </form>
-                ) : (
-                  <div>
-                    <div>
-                      <strong>Q:</strong> {card.question}
-                    </div>
+                        <Stack direction="row" spacing={1}>
+                          <Button
+                            type="submit"
+                            variant="contained"
+                            size="small"
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={cancelEdit}
+                          >
+                            Cancel
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  ) : (
+                    <Stack spacing={1}>
+                      <Box>
+                        <Typography variant="subtitle2" fontWeight={600}>
+                          Q:
+                        </Typography>
+                        <Typography variant="body1">{card.question}</Typography>
+                      </Box>
 
-                    <div>
-                      <strong>A:</strong>{" "}
-                      {isRevealed ? (
-                        <span>{card.answer}</span>
-                      ) : (
-                        <span>[ hidden ]</span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => toggleReveal(card.id)}
-                        style={{ marginLeft: "0.5rem" }}
-                      >
-                        {isRevealed ? "Hide" : "Show"}
-                      </button>
-                    </div>
+                      <Box>
+                        <Typography variant="subtitle2" fontWeight={600}>
+                          A:
+                        </Typography>
 
-                    {card.note ? (
-                      <div>
-                        <strong>Note:</strong> {card.note}
-                      </div>
-                    ) : null}
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Typography variant="body1">
+                            {isRevealed ? card.answer : "[ hidden ]"}
+                          </Typography>
 
-                    <div>
-                      <button onClick={() => startEdit(card)}>Edit</button>
-                      <button onClick={() => handleDeleteFlashcard(card.id)}>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => toggleReveal(card.id)}
+                          >
+                            {isRevealed ? "Hide" : "Show"}
+                          </Button>
+                        </Stack>
+                      </Box>
+
+                      {card.note ? (
+                        <Box>
+                          <Typography variant="subtitle2" fontWeight={600}>
+                            Note:
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {card.note}
+                          </Typography>
+                        </Box>
+                      ) : null}
+
+                      <Stack direction="row" spacing={1} sx={{ pt: 1 }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => startEdit(card)}
+                        >
+                          Edit
+                        </Button>
+
+                        <Button
+                          variant="text"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteFlashcard(card.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  )}
+                </CardContent>
+              </Card>
             );
           })}
-        </ul>
+        </Stack>
       )}
-    </section>
+    </Box>
   );
 }

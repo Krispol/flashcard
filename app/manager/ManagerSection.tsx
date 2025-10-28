@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { Questionnaire } from "@/types/objects";
 
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+
 interface ManagerSectionProps {
   onSelect: (id: string) => void;
   onDeleted: (id: string) => void;
@@ -41,7 +50,12 @@ export default function ManagerSection({
 
     const { data, error } = await supabaseBrowser
       .from("questionnaire")
-      .insert([{ title: newTitle.trim(), description: newDesc.trim() || null }])
+      .insert([
+        {
+          title: newTitle.trim(),
+          description: newDesc.trim() || null,
+        },
+      ])
       .select("*")
       .single();
 
@@ -87,6 +101,7 @@ export default function ManagerSection({
     }
 
     setQuestionnaires((prev) => prev.map((q) => (q.id === editId ? data : q)));
+
     cancelEditQuestionnaire();
   }
 
@@ -102,86 +117,142 @@ export default function ManagerSection({
     }
 
     setQuestionnaires((prev) => prev.filter((q) => q.id !== id));
+
     onDeleted(id);
 
-    if (editId === id) {
-      cancelEditQuestionnaire();
-    }
+    if (editId === id) cancelEditQuestionnaire();
   }
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h1>Questionnaires</h1>
+    <Box p={2}>
+      <Typography variant="h4" gutterBottom>
+        Questionnaires
+      </Typography>
 
-      <section>
-        <h2>Create</h2>
-        <form onSubmit={handleCreateQuestionnaire}>
-          <div>
-            <input
-              required
-              placeholder="Title"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-            />
-          </div>
+      <Box component="form" onSubmit={handleCreateQuestionnaire} sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Create new
+        </Typography>
 
-          <div>
-            <input
-              placeholder="Description"
-              value={newDesc}
-              onChange={(e) => setNewDesc(e.target.value)}
-            />
-          </div>
+        <Stack spacing={2} maxWidth={400}>
+          <TextField
+            required
+            label="Title"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            size="small"
+          />
 
-          <button type="submit">Add</button>
-        </form>
-      </section>
+          <TextField
+            label="Description"
+            value={newDesc}
+            onChange={(e) => setNewDesc(e.target.value)}
+            size="small"
+          />
 
-      <section>
-        <h2>Existing questionnaires:</h2>
+          <Button type="submit" variant="contained">
+            Add
+          </Button>
+        </Stack>
+      </Box>
 
-        {questionnaires.length === 0 ? (
-          <p>None yet.</p>
-        ) : (
-          <ul>
-            {questionnaires.map((q) => (
-              <li key={q.id} style={{ marginBottom: "1rem" }}>
-                {editId === q.id ? (
-                  <form onSubmit={handleSaveEditQuestionnaire}>
-                    <input
-                      required
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                    />
-                    <input
-                      value={editDesc}
-                      onChange={(e) => setEditDesc(e.target.value)}
-                    />
-                    <button type="submit">Save</button>
-                    <button type="button" onClick={cancelEditQuestionnaire}>
-                      Cancel
-                    </button>
-                  </form>
-                ) : (
-                  <div>
-                    <strong>{q.title}</strong>{" "}
-                    {q.description && <span>— {q.description}</span>}
-                    <div>
-                      <button onClick={() => onSelect(q.id)}>Select</button>
-                      <button onClick={() => startEditQuestionnaire(q)}>
-                        Edit
-                      </button>
-                      <button onClick={() => handleDeleteQuestionnaire(q.id)}>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+      <Divider sx={{ mb: 3 }} />
+
+      <Typography variant="h6" gutterBottom>
+        Existing questionnaires
+      </Typography>
+
+      {questionnaires.length === 0 ? (
+        <Typography color="text.secondary">None yet.</Typography>
+      ) : (
+        <Stack spacing={2}>
+          {questionnaires.map((q) => {
+            const isEditing = editId === q.id;
+
+            return (
+              <Card key={q.id} variant="outlined">
+                <CardContent>
+                  {isEditing ? (
+                    <Box
+                      component="form"
+                      onSubmit={handleSaveEditQuestionnaire}
+                    >
+                      <Stack spacing={2}>
+                        <TextField
+                          required
+                          label="Title"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          size="small"
+                        />
+
+                        <TextField
+                          label="Description"
+                          value={editDesc}
+                          onChange={(e) => setEditDesc(e.target.value)}
+                          size="small"
+                        />
+
+                        <Stack direction="row" spacing={1}>
+                          <Button type="submit" variant="contained">
+                            Save
+                          </Button>
+                          <Button
+                            variant="text"
+                            onClick={cancelEditQuestionnaire}
+                          >
+                            Cancel
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  ) : (
+                    <Stack spacing={1}>
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {q.title}
+                        </Typography>
+                        {q.description && (
+                          <Typography variant="body2" color="text.secondary">
+                            {q.description}
+                          </Typography>
+                        )}
+                      </Box>
+
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => onSelect(q.id)}
+                        >
+                          Select
+                        </Button>
+
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => startEditQuestionnaire(q)}
+                        >
+                          Edit
+                        </Button>
+
+                        <Button
+                          variant="text"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDeleteQuestionnaire(q.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </Stack>
+      )}
+    </Box>
   );
 }
