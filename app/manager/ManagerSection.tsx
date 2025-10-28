@@ -32,7 +32,7 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
     })();
   }, []);
 
-  async function handleCreate(e: React.FormEvent) {
+  async function handleCreateQuestionnaire(e: React.FormEvent) {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
@@ -43,7 +43,7 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
       .single();
 
     if (error) {
-      console.error("Create error:", error);
+      console.error("Create Questionnaire error:", error);
       return;
     }
 
@@ -52,19 +52,19 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
     setNewDesc("");
   }
 
-  function startEdit(q: Questionnaire) {
+  function startEditQuestionnaire(q: Questionnaire) {
     setEditId(q.id);
     setEditTitle(q.title);
     setEditDesc(q.description ?? "");
   }
 
-  function cancelEdit() {
+  function cancelEditQuestionnaire() {
     setEditId(null);
     setEditTitle("");
     setEditDesc("");
   }
 
-  async function handleSaveEdit(e: React.FormEvent) {
+  async function handleSaveEditQuestionnaire(e: React.FormEvent) {
     e.preventDefault();
     if (!editId) return;
 
@@ -79,26 +79,31 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
       .single();
 
     if (error) {
-      console.error("Update error:", error);
+      console.error("Update Questionnaire error:", error);
       return;
     }
 
     setQuestionnaires((prev) => prev.map((q) => (q.id === editId ? data : q)));
-    cancelEdit();
+    cancelEditQuestionnaire();
   }
 
-  async function handleDelete(id: string) {
+  async function handleDeleteQuestionnaire(id: string) {
     const { error } = await supabaseBrowser
       .from("questionnaire")
       .delete()
       .eq("id", id);
+
     if (error) {
-      console.error("Delete error:", error);
+      console.error("Delete Questionnaire error:", error);
       return;
     }
 
     setQuestionnaires((prev) => prev.filter((q) => q.id !== id));
-    if (editId === id) cancelEdit();
+    onDeleted(id);
+
+    if (editId === id) {
+      cancelEditQuestionnaire();
+    }
   }
 
   return (
@@ -107,7 +112,7 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
 
       <section>
         <h2>Create</h2>
-        <form onSubmit={handleCreate}>
+        <form onSubmit={handleCreateQuestionnaire}>
           <div>
             <input
               required
@@ -116,6 +121,7 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
               onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
+
           <div>
             <input
               placeholder="Description"
@@ -123,20 +129,22 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
               onChange={(e) => setNewDesc(e.target.value)}
             />
           </div>
+
           <button type="submit">Add</button>
         </form>
       </section>
 
       <section>
         <h2>Existing questionnaires:</h2>
+
         {questionnaires.length === 0 ? (
           <p>None yet.</p>
         ) : (
           <ul>
             {questionnaires.map((q) => (
-              <li key={q.id}>
+              <li key={q.id} style={{ marginBottom: "1rem" }}>
                 {editId === q.id ? (
-                  <form onSubmit={handleSaveEdit}>
+                  <form onSubmit={handleSaveEditQuestionnaire}>
                     <input
                       required
                       value={editTitle}
@@ -147,7 +155,7 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
                       onChange={(e) => setEditDesc(e.target.value)}
                     />
                     <button type="submit">Save</button>
-                    <button type="button" onClick={cancelEdit}>
+                    <button type="button" onClick={cancelEditQuestionnaire}>
                       Cancel
                     </button>
                   </form>
@@ -156,8 +164,13 @@ export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
                     <strong>{q.title}</strong>{" "}
                     {q.description && <span>— {q.description}</span>}
                     <div>
-                      <button onClick={() => startEdit(q)}>Edit</button>
-                      <button onClick={() => handleDelete(q.id)}>Delete</button>
+                      <button onClick={() => onSelect(q.id)}>Select</button>
+                      <button onClick={() => startEditQuestionnaire(q)}>
+                        Edit
+                      </button>
+                      <button onClick={() => handleDeleteQuestionnaire(q.id)}>
+                        Delete
+                      </button>
                     </div>
                   </div>
                 )}
