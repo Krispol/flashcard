@@ -191,6 +191,9 @@ export default function ManagerSection({
                           value={editDesc}
                           onChange={(e) => setEditDesc(e.target.value)}
                           size="small"
+                          multiline
+                          minRows={3}
+                          maxRows={10}
                         />
 
                         <Stack direction="row" spacing={1}>

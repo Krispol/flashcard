@@ -194,6 +194,8 @@ export default function FlashcardSection({
             value={newQ}
             onChange={(e) => setNewQ(e.target.value)}
             size="small"
+            multiline
+            maxRows={5}
           />
 
           <TextField
@@ -202,6 +204,8 @@ export default function FlashcardSection({
             value={newA}
             onChange={(e) => setNewA(e.target.value)}
             size="small"
+            multiline
+            maxRows={10}
           />
 
           <TextField
@@ -249,6 +253,8 @@ export default function FlashcardSection({
                           value={editQ}
                           onChange={(e) => setEditQ(e.target.value)}
                           size="small"
+                          multiline
+                          maxRows={5}
                         />
 
                         <TextField
@@ -257,6 +263,8 @@ export default function FlashcardSection({
                           value={editA}
                           onChange={(e) => setEditA(e.target.value)}
                           size="small"
+                          multiline
+                          maxRows={10}
                         />
 
                         <TextField
