@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Manager from "./ManagerSection";
+import ManagerSection from "./ManagerSection";
 import FlashcardSection from "./FlashSection";
 
-export default function ManagerPage() {
+export default function managerPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   function handleSelectQuestionnaire(id: string) {
     setActiveId(id);
@@ -23,7 +23,7 @@ export default function ManagerPage() {
   return (
     <div style={{ padding: "1rem" }}>
       {!activeId ? (
-        <Manager
+        <ManagerSection
           onSelect={handleSelectQuestionnaire}
           onDeleted={handleDeletedQuestionnaire}
         />

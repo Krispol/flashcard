@@ -9,7 +9,10 @@ interface ManagerSectionProps {
   onDeleted: (id: string) => void;
 }
 
-export default function Manager({ onSelect, onDeleted }: ManagerSectionProps) {
+export default function ManagerSection({
+  onSelect,
+  onDeleted,
+}: ManagerSectionProps) {
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
