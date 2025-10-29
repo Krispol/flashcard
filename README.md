@@ -3,7 +3,7 @@
 (very) basic Flashcard app with:
 
 - Create,Read,Update and Delete functionality
-- Play modes
+- Play mode
 - Usage statistics
 
 The app is split into Questionnaire management and flashcards that relate to their respective questionnaires.
@@ -30,7 +30,6 @@ create table flash (
   updated_at timestamptz not null default now()
 );
 
--- 3. updated_at trigger
 create or replace function set_updated_at()
 returns trigger as $$
 begin

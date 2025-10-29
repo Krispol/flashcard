@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { Flashcard } from "@/types/objects";
 
@@ -16,16 +17,14 @@ import Divider from "@mui/material/Divider";
 
 interface FlashcardSectionProps {
   questionnaireId: string;
-  onBack: () => void;
-  onStartQuiz: () => void;
+  initialFlashcards: Flashcard[];
 }
 
-export default function FlashcardSection({
+export default function FlashcardSectionClient({
   questionnaireId,
-  onBack,
-  onStartQuiz,
+  initialFlashcards,
 }: FlashcardSectionProps) {
-  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [flashcards, setFlashcards] = useState<Flashcard[]>(initialFlashcards);
 
   const [newQ, setNewQ] = useState("");
   const [newA, setNewA] = useState("");
@@ -36,25 +35,9 @@ export default function FlashcardSection({
   const [editA, setEditA] = useState("");
   const [editNote, setEditNote] = useState("");
 
-  const [revealed, setRevealed] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabaseBrowser
-        .from("flash")
-        .select("*")
-        .eq("questionnaire_id", questionnaireId)
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("Failed to load flashcards:", error);
-        return;
-      }
-
-      setFlashcards(data);
-      setRevealed(new Set(data.map((c) => c.id)));
-    })();
-  }, [questionnaireId]);
+  const [revealed, setRevealed] = useState<Set<string>>(
+    () => new Set(initialFlashcards.map((c) => c.id))
+  );
 
   async function handleCreateFlashcard(e: React.FormEvent) {
     e.preventDefault();
@@ -168,20 +151,22 @@ export default function FlashcardSection({
   return (
     <Box p={3}>
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Button variant="text" onClick={onBack}>
-          ← Back
-        </Button>
+        <Link href="/flash">
+          <Button variant="text">← Back</Button>
+        </Link>
 
         <Typography variant="h4" sx={{ flexGrow: 1 }}>
           Flashcards
         </Typography>
 
-        <Button variant="contained" size="small" onClick={onStartQuiz}>
-          ▶ Quiz mode
-        </Button>
+        <Link href={`/flash/${questionnaireId}/quiz`}>
+          <Button variant="contained" size="small">
+            ▶ Quiz mode
+          </Button>
+        </Link>
       </Stack>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 5 }}>
           <Card variant="outlined">
             <CardContent>
@@ -291,6 +276,7 @@ export default function FlashcardSection({
                                   >
                                     Save
                                   </Button>
+
                                   <Button
                                     variant="text"
                                     size="small"
@@ -308,7 +294,7 @@ export default function FlashcardSection({
                                   variant="subtitle2"
                                   fontWeight={600}
                                 >
-                                  Q:
+                                  Question:
                                 </Typography>
                                 <Typography variant="body1">
                                   {card.question}
@@ -320,7 +306,7 @@ export default function FlashcardSection({
                                   variant="subtitle2"
                                   fontWeight={600}
                                 >
-                                  A:
+                                  Answer:
                                 </Typography>
 
                                 <Stack

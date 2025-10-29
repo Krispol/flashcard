@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { Flashcard } from "@/types/objects";
+
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
@@ -15,19 +17,18 @@ import Divider from "@mui/material/Divider";
 
 interface QuizSectionProps {
   questionnaireId: string;
-  onBack: () => void;
 }
 
-export default function QuizSection({
-  questionnaireId,
-  onBack,
-}: QuizSectionProps) {
+export default function QuizSection({ questionnaireId }: QuizSectionProps) {
   const [cards, setCards] = useState<Flashcard[]>([]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [quizDone, setQuizDone] = useState(false);
+
   const [userAnswer, setUserAnswer] = useState("");
   const [checked, setChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
 
@@ -44,8 +45,7 @@ export default function QuizSection({
         return;
       }
 
-      setCards(data);
-
+      setCards(data || []);
       setCurrentIndex(0);
       setQuizDone(false);
 
@@ -121,9 +121,9 @@ export default function QuizSection({
       >
         <Stack spacing={2} sx={{ maxWidth: 500, width: "100%" }}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <Button variant="text" onClick={onBack}>
-              ← Back
-            </Button>
+            <Link href={`/flash/${questionnaireId}`}>
+              <Button variant="text">← Back</Button>
+            </Link>
 
             <Typography variant="h4">Quiz mode</Typography>
           </Stack>
@@ -151,9 +151,9 @@ export default function QuizSection({
       >
         <Stack spacing={3} sx={{ maxWidth: 500, width: "100%" }}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <Button variant="text" onClick={onBack}>
-              ← Back
-            </Button>
+            <Link href={`/flash/${questionnaireId}`}>
+              <Button variant="text">← Back</Button>
+            </Link>
 
             <Typography variant="h4">Quiz results</Typography>
           </Stack>
@@ -189,9 +189,11 @@ export default function QuizSection({
                     Restart quiz
                   </Button>
 
-                  <Button variant="outlined" size="small" onClick={onBack}>
-                    Back to cards
-                  </Button>
+                  <Link href={`/flash/${questionnaireId}`}>
+                    <Button variant="outlined" size="small">
+                      Back to cards
+                    </Button>
+                  </Link>
                 </Stack>
               </Stack>
             </CardContent>
@@ -217,9 +219,9 @@ export default function QuizSection({
     >
       <Stack spacing={2} sx={{ maxWidth: 600, width: "100%" }}>
         <Stack direction="row" spacing={2} alignItems="center">
-          <Button variant="text" onClick={onBack}>
-            ← Back
-          </Button>
+          <Link href={`/flash/${questionnaireId}`}>
+            <Button variant="text">← Back</Button>
+          </Link>
 
           <Typography variant="h4">Quiz mode</Typography>
 
@@ -280,7 +282,7 @@ export default function QuizSection({
 
                   {checked && isCorrect === false && (
                     <Alert severity="error" variant="filled">
-                      Incorrect, the correct answer can be seen below:
+                      Incorrect, here is the correct answer:
                     </Alert>
                   )}
                 </Stack>
@@ -294,8 +296,8 @@ export default function QuizSection({
                 {autoReveal ? (
                   <Typography variant="body1">{current.answer}</Typography>
                 ) : (
-                  <Typography variant="body1">
-                    [ hidden until checked ]
+                  <Typography variant="caption" color="text.secondary">
+                    [ hidden until you click check ]
                   </Typography>
                 )}
               </Box>
@@ -318,7 +320,7 @@ export default function QuizSection({
                 justifyContent="space-between"
               >
                 <Button variant="contained" size="small" onClick={handleNext}>
-                  {currentIndex === cards.length - 1 ? "Finish" : "Next"}
+                  {currentIndex === cards.length - 1 ? "Finish ✔" : "Next →"}
                 </Button>
               </Stack>
             </Stack>

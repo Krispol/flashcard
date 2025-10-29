@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { Questionnaire } from "@/types/objects";
@@ -15,35 +16,25 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 
 interface ManagerSectionProps {
-  onSelect: (id: string) => void;
-  onDeleted: (id: string) => void;
+  initialQuestionnaires: Questionnaire[];
+  onSelect?: (id: string) => void;
+  onDeleted?: (id: string) => void;
 }
 
 export default function ManagerSection({
-  onSelect,
-  onDeleted,
+  initialQuestionnaires,
+  onSelect = () => {},
+  onDeleted = () => {},
 }: ManagerSectionProps) {
-  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
+  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>(
+    initialQuestionnaires
+  );
+
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
-
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabaseBrowser
-        .from("questionnaire")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Failed to load questionnaires:", error);
-      } else {
-        setQuestionnaires(data);
-      }
-    })();
-  }, []);
 
   async function handleCreateQuestionnaire(e: React.FormEvent) {
     e.preventDefault();
@@ -128,7 +119,7 @@ export default function ManagerSection({
         Questionnaires
       </Typography>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 5 }}>
           <Card variant="outlined">
             <CardContent>
@@ -234,6 +225,7 @@ export default function ManagerSection({
                                 >
                                   {q.title}
                                 </Typography>
+
                                 {q.description && (
                                   <Typography
                                     variant="body2"
@@ -245,13 +237,11 @@ export default function ManagerSection({
                               </Box>
 
                               <Stack direction="row" spacing={1}>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => onSelect(q.id)}
-                                >
-                                  Select
-                                </Button>
+                                <Link href={`/flash/${q.id}`}>
+                                  <Button variant="contained" size="small">
+                                    Select
+                                  </Button>
+                                </Link>
 
                                 <Button
                                   variant="outlined"
