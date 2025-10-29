@@ -1,10 +1,9 @@
 import { supabaseServer } from "@/lib/supabase-server";
 import ManagerSectionClient from "./ManagerSectionClient";
-
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { darkTheme } from "@/src/theme";
 
-export default async function QuestionnairesPage() {
+export default async function ManagerSectionServer() {
   const supabase = supabaseServer();
 
   const { data: questionnaires, error } = await supabase
@@ -19,7 +18,6 @@ export default async function QuestionnairesPage() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-
       <ManagerSectionClient initialQuestionnaires={questionnaires ?? []} />
     </ThemeProvider>
   );

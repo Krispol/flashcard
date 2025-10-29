@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { Questionnaire } from "@/types/objects";
 
@@ -23,7 +23,6 @@ interface ManagerSectionProps {
 
 export default function ManagerSection({
   initialQuestionnaires,
-  onSelect = () => {},
   onDeleted = () => {},
 }: ManagerSectionProps) {
   const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>(
