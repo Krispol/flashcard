@@ -148,6 +148,9 @@ export default function ManagerSection({
             value={newDesc}
             onChange={(e) => setNewDesc(e.target.value)}
             size="small"
+            multiline
+            maxRows={15}
+            minRows={3}
           />
 
           <Button type="submit" variant="contained">
@@ -193,7 +196,6 @@ export default function ManagerSection({
                           size="small"
                           multiline
                           minRows={3}
-                          maxRows={10}
                         />
 
                         <Stack direction="row" spacing={1}>

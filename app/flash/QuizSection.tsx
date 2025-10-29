@@ -52,18 +52,29 @@ export default function QuizSection({
 
   if (cards.length === 0) {
     return (
-      <Box p={2}>
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-          <Button variant="text" onClick={onBack}>
-            ← Back
-          </Button>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          backgroundColor: "background.default",
+          p: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Stack spacing={2} sx={{ maxWidth: 500, width: "100%" }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Button variant="text" onClick={onBack}>
+              ← Back
+            </Button>
 
-          <Typography variant="h4">Quiz mode</Typography>
+            <Typography variant="h4">Quiz mode</Typography>
+          </Stack>
+
+          <Typography color="text.secondary">
+            No flashcards available in this questionnaire.
+          </Typography>
         </Stack>
-
-        <Typography color="text.secondary">
-          No flashcards available in this questionnaire.
-        </Typography>
       </Box>
     );
   }
@@ -71,76 +82,87 @@ export default function QuizSection({
   const current = cards[currentIndex];
 
   return (
-    <Box p={2}>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <Button variant="text" onClick={onBack}>
-          ← Back
-        </Button>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "background.default",
+        p: 2,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Stack spacing={2} sx={{ maxWidth: 500, width: "100%" }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Button variant="text" onClick={onBack}>
+            ← Back
+          </Button>
 
-        <Typography variant="h4">Quiz mode</Typography>
-      </Stack>
+          <Typography variant="h4">Quiz mode</Typography>
+        </Stack>
 
-      <Card variant="outlined">
-        <CardContent>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="subtitle2" fontWeight={600}>
-                Q:
-              </Typography>
-              <Typography variant="body1">{current.question}</Typography>
-            </Box>
-
-            <Box>
-              <Typography variant="subtitle2" fontWeight={600}>
-                A:
-              </Typography>
-
-              {showAnswer ? (
-                <Typography variant="body1">{current.answer}</Typography>
-              ) : (
-                <Typography variant="body1">[ hidden ]</Typography>
-              )}
-
-              {!showAnswer && (
-                <Button
-                  sx={{ mt: 1 }}
-                  variant="outlined"
-                  size="small"
-                  onClick={() => setShowAnswer(true)}
-                >
-                  Show answer
-                </Button>
-              )}
-            </Box>
-
-            {current.note ? (
+        <Card variant="outlined">
+          <CardContent>
+            <Stack spacing={2}>
               <Box>
                 <Typography variant="subtitle2" fontWeight={600}>
-                  Note:
+                  Q:
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {current.note}
-                </Typography>
+                <Typography variant="body1">{current.question}</Typography>
               </Box>
-            ) : null}
 
-            <Stack
-              direction="row"
-              spacing={2}
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Button variant="contained" size="small" onClick={handleNext}>
-                Next →
-              </Button>
+              <Box>
+                <Typography variant="subtitle2" fontWeight={600}>
+                  A:
+                </Typography>
 
-              <Typography variant="caption" color="text.secondary">
-                Card {currentIndex + 1} / {cards.length}
-              </Typography>
+                {showAnswer ? (
+                  <Typography variant="body1">{current.answer}</Typography>
+                ) : (
+                  <Typography variant="body1">[ hidden ]</Typography>
+                )}
+
+                {!showAnswer && (
+                  <Button
+                    sx={{ mt: 1 }}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setShowAnswer(true)}
+                  >
+                    Show answer
+                  </Button>
+                )}
+              </Box>
+
+              {current.note ? (
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    Note:
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {current.note}
+                  </Typography>
+                </Box>
+              ) : null}
+
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Button variant="contained" size="small" onClick={handleNext}>
+                  Next →
+                </Button>
+
+                <Typography variant="caption" color="text.secondary">
+                  Card {currentIndex + 1} / {cards.length}
+                </Typography>
+              </Stack>
             </Stack>
-          </Stack>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </Stack>
     </Box>
   );
 }

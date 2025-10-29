@@ -4,6 +4,8 @@ import { useState } from "react";
 import ManagerSection from "./ManagerSection";
 import FlashcardSection from "./FlashSection";
 import QuizSection from "./QuizSection";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { darkTheme } from "@/src/theme";
 
 type Mode = "list" | "flashcards" | "quiz";
 
@@ -37,7 +39,8 @@ export default function ManagerPage() {
   }
 
   return (
-    <>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       {mode === "list" && (
         <ManagerSection
           onSelect={handleSelectQuestionnaire}
@@ -59,6 +62,6 @@ export default function ManagerPage() {
           onBack={handleBackToFlashcards}
         />
       )}
-    </>
+    </ThemeProvider>
   );
 }
